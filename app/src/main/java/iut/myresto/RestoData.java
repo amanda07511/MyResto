@@ -208,10 +208,12 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
     public void dialogAddComment(){
         AlertDialog.Builder builder = new AlertDialog.Builder(RestoData.this);
         LayoutInflater inflater = RestoData.this.getLayoutInflater();
+        builder.setMessage("Make hear your voice!");
+
         builder.setView(inflater.inflate(R.layout.activity_comment_dialog, null));
 
 
-        builder.setPositiveButton("yes",
+        builder.setPositiveButton("Create",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
@@ -219,7 +221,7 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
                     }
                 });
 
-        builder.setNegativeButton("No",new DialogInterface.OnClickListener() {
+        builder.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 finish();
             }

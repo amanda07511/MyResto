@@ -105,7 +105,6 @@ public class RestoCategorie  extends AppCompatActivity {
                     textResto.setText("Theres any resto in this categorie, you coul add a new one!");
                     textResto.setVisibility(View.VISIBLE);
                 }
-                Log.d("Respuesta! D:", error.getMessage());
 
 
             }
