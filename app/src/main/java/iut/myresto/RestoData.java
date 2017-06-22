@@ -118,8 +118,13 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
         GoogleAddress direction = new GoogleAddress(r.getLat(), r.getLng(), this);
         addres = direction.getAddress();
         city = direction.getCity();
+        if( r.getUser() != null){
+            user.setText(r.getUser().getNom());
+        }else {
+            user.setVisibility(View.GONE);
+            photoUser.setVisibility(View.GONE);
+        }
 
-        user.setText(r.getUser().getNom());
         titre.setText(r.getNom());
         address.setText(addres+", "+city);
         type.setText(r.getType());

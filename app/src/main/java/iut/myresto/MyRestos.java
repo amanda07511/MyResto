@@ -80,6 +80,14 @@ public class MyRestos extends AppCompatActivity {
         //Initializing adapter
         mAdapter = new MyAdapter(this, initialRestos);
         mRecyclerView.setAdapter(mAdapter);
+
+        fb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MyRestos.this, NewResto.class);
+                startActivity(i);
+            }
+        });
     }
 
     @Override

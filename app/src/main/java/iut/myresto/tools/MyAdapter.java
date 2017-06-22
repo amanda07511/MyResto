@@ -104,9 +104,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         address = direction.getAddress();
         city = direction.getCity();
         //id.add(r.getId());
+        if(r.getUser() != null){
+            holder.user.setText(r.getUser().getNom());
+        }
 
-
-        holder.user.setText(r.getUser().getNom());
         holder.titre.setText(r.getNom());
         holder.address.setText(address+", "+city);
         holder.type.setText(r.getType());
