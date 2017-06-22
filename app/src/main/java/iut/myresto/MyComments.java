@@ -48,10 +48,7 @@ public class MyComments extends AppCompatActivity {
     private MyAdapterComment mAdapter;
     private ArrayList<Comment> initialComments = new ArrayList<>();
     private Paint p = new Paint();
-    private View view;
     private DatabaseHandler database;
-    private  User user;
-    private  User  u;
 
     // UI elements
     private RecyclerView mRecyclerView;

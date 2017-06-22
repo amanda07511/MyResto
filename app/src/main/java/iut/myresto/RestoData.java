@@ -1,5 +1,6 @@
 package iut.myresto;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
@@ -13,7 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -52,6 +55,9 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
     Resto r;
     private String addres;
     private String city;
+    private String token;
+    private String comment;
+    private double note;
 
     // UI elements
     public TextView user;
@@ -62,14 +68,13 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
     public ImageView photoUser;
     public TableRow photoResto;
     public TableLayout table;
+    public EditText message;
+    public RatingBar raiting;
 
     //Components
     private MyAdapterComment mAdapter;
     private ArrayList<Comment> initialComments = new ArrayList<>();
     private DatabaseHandler database;
-    private  User  u;
-    private String url = "https://myrestoapp.herokuapp.com/";
-    private String token;
 
     // UI elements
     private RecyclerView mRecyclerView;
@@ -93,6 +98,12 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
         Gson gson = new Gson();
         r = gson.fromJson(resto,Resto.class);
 
+        //Getting kept data of the database
+        database = new DatabaseHandler(RestoData.this);
+        database.open();
+        token = database.getToken();
+        database.close();
+
         //Initializing items
         user = (TextView) findViewById(R.id.user);
         titre = (TextView) findViewById(R.id.titre);
@@ -102,6 +113,7 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
         photoUser = (ImageView) findViewById(R.id.photoUser);
         photoResto = (TableRow) findViewById(R.id.photoResto);
         table = (TableLayout) findViewById(R.id.row);
+
 
         GoogleAddress direction = new GoogleAddress(r.getLat(), r.getLng(), this);
         addres = direction.getAddress();
@@ -182,8 +194,8 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse.headers.containsValue("NETWORK 404")) {
-                    message();
-                }
+                    message("Oh, something was wrong...");
+            }
                 Log.d("Respuesta! D:", error.getMessage());
 
 
@@ -200,24 +212,28 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
 
     }
 
-    public void message(){
-        Toast.makeText(this, "No coincidences", Toast.LENGTH_SHORT).show();
+    public void message(String message){
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
-
 
     public void dialogAddComment(){
         AlertDialog.Builder builder = new AlertDialog.Builder(RestoData.this);
         LayoutInflater inflater = RestoData.this.getLayoutInflater();
-        builder.setMessage("Make hear your voice!");
+        View dialoglayout = inflater.inflate(R.layout.activity_comment_dialog, null);
 
-        builder.setView(inflater.inflate(R.layout.activity_comment_dialog, null));
+        builder.setView(dialoglayout);
+
+        message = (EditText) dialoglayout.findViewById(R.id.comment);
+        raiting = (RatingBar) dialoglayout.findViewById(R.id.ratingBar);
 
 
         builder.setPositiveButton("Create",
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface arg0, int arg1) {
-
+                        comment = message.getText().toString();
+                        note = raiting.getRating();
+                        createComment();
                     }
                 });
 
@@ -229,5 +245,59 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
+    }
+
+    private void createComment() {
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest sr = new StringRequest(Request.Method.POST, "https://myrestoapp.herokuapp.com/notes/create", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                //Convert the response to a JSONObject
+                Log.d("Response", response);
+                message("Your comment was correctly sumited");
+                initialComments.removeAll(initialComments);
+                getComments("https://myrestoapp.herokuapp.com/notes/get/"+r.getId());
+                mAdapter.notifyDataSetChanged();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if (error.networkResponse.headers.containsValue("NETWORK 404")) {
+                    message("Oh, something was wrong...");
+                }
+                Log.d("Respuesta! D:", error.getMessage());
+
+
+            }
+        }){
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                return super.parseNetworkResponse(response);
+            }
+            @Override
+            protected Map<String,String> getParams(){
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("note", String.valueOf(note));
+                params.put("message", comment);
+                params.put("resto", String.valueOf(r.getId()));
+
+                return params;
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String,String> params = new HashMap<String, String>();
+                params.put("Content-Type","application/x-www-form-urlencoded");
+                params.put("token",token);
+
+                return params;
+            }
+
+        };
+        queue.add(sr);
+
+
     }
 }

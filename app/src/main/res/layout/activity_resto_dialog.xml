@@ -34,7 +34,7 @@
             android:stepSize=".1"
             android:isIndicator="false"
             style="?android:attr/ratingBarStyleSmall"
-            android:layout_width="120dp" />
+            android:layout_width="110dp" />
 
     </LinearLayout>
 

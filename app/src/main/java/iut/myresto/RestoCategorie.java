@@ -26,6 +26,7 @@ import java.util.Map;
 
 import iut.myresto.models.Resto;
 import iut.myresto.tools.MyAdapter;
+import iut.myresto.tools.MyAdapterComment;
 import iut.myresto.tools.db.DatabaseHandler;
 
 /**
@@ -60,21 +61,34 @@ public class RestoCategorie  extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         categorie = extras.getString("Type");
 
+
+
         try {
             name = java.net.URLEncoder.encode(categorie, "UTF-8").replace("+", "%20");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+
+        fb = (FloatingActionButton) findViewById(R.id.floatingActionButton);
+        fb.setVisibility(View.GONE);
+
+        //Setting configurations
+        mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setPadding(0,35,0,0);
+
+        //Initializing adapter
+        mAdapter = new MyAdapter(this, initialRestos);
+        mRecyclerView.setAdapter(mAdapter);
+
         getRestos("https://myrestoapp.herokuapp.com/resto/getType/"+name);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_view);
         textResto = (TextView) findViewById(R.id.textResto);
 
-        //Setting configurations
-        mRecyclerView.setHasFixedSize(true);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setPadding(0,35,0,0);
+
 
     }
 
