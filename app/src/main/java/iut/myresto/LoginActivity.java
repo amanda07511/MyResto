@@ -489,16 +489,19 @@ public class LoginActivity extends AppCompatActivity  {
         StringRequest sr = new StringRequest(Request.Method.POST, url+"signup", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                token = response.substring(1);
-                Log.d("Respuesta! :D", response);
+                //Convert the response to a JSONObject
+                try {
+                    JSONObject jsonRespuesta = new JSONObject(response);
+                    token = jsonRespuesta.getString("token");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 Log.d("Token",token);
-                user = new User("Lubino", "Marie", "marie@gmail.com", "123", null);
-
-                //Getting kept data of the database
-                database = new DatabaseHandler(LoginActivity.this);
-                database.open();
-                database.addObj(1,token, user);
-                database.close();
+                JWT parsedJWT = new JWT(token);
+                Claim subscriptionMetaData = parsedJWT.getClaim("id");
+                String parsedValue = subscriptionMetaData.asString();
+                Log.d("ID",parsedValue);
+                getUser("https://myrestoapp.herokuapp.com/user/");
             }
         }, new Response.ErrorListener() {
             @Override

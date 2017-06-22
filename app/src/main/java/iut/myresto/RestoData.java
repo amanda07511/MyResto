@@ -70,6 +70,7 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
     public TableLayout table;
     public EditText message;
     public RatingBar raiting;
+    public TextView text;
 
     //Components
     private MyAdapterComment mAdapter;
@@ -113,6 +114,7 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
         photoUser = (ImageView) findViewById(R.id.photoUser);
         photoResto = (TableRow) findViewById(R.id.photoResto);
         table = (TableLayout) findViewById(R.id.row);
+        text = (TextView) findViewById(R.id.textView);
 
 
         GoogleAddress direction = new GoogleAddress(r.getLat(), r.getLng(), this);
@@ -132,6 +134,11 @@ public class RestoData extends AppCompatActivity implements OnMapReadyCallback {
 
         fb = (FloatingActionButton) findViewById(R.id.floatingActionButton);
         mRecyclerView = (RecyclerView) findViewById(R.id.my_recycler_comment);
+
+        if(token == null){
+            text.setVisibility(View.GONE);
+            fb.setVisibility(View.GONE);
+        }
 
         getComments("https://myrestoapp.herokuapp.com/notes/get/"+r.getId());
 
